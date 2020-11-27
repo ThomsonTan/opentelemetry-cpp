@@ -6,6 +6,8 @@ coverage:
   precision: 2
   round: down
   range: "80...100"
+  status:
+    patch: off
 
 parsers:
   gcov:
@@ -22,7 +24,7 @@ comment:
 
 # Relative file path fixing.
 # CI file paths must match Git file paths.
-# This fix removes the "/home/runner/" prefix 
+# This fix removes the "/home/runner/" prefix
 # to coverage report file paths.
 fixes:
   - "/home/runner/::"

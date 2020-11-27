@@ -71,7 +71,7 @@ public:
   int compare(string_view v) const noexcept
   {
     size_type len = std::min(size(), v.size());
-    int result = Traits::compare(data(), v.data(), len);
+    int result    = Traits::compare(data(), v.data(), len);
     if (result == 0)
       result = size() == v.size() ? 0 : (size() < v.size() ? -1 : 1);
     return result;
@@ -82,15 +82,16 @@ public:
     return substr(pos1, count1).compare(v);
   };
 
-  int compare(size_type pos1, size_type count1, string_view v, size_type pos2, size_type count2) const
+  int compare(size_type pos1,
+              size_type count1,
+              string_view v,
+              size_type pos2,
+              size_type count2) const
   {
     return substr(pos1, count1).compare(v.substr(pos2, count2));
   };
 
-  int compare(const char *s) const
-  {
-    return compare(string_view(s));
-  };
+  int compare(const char *s) const { return compare(string_view(s)); };
 
   int compare(size_type pos1, size_type count1, const char *s) const
   {
@@ -102,15 +103,9 @@ public:
     return substr(pos1, count1).compare(string_view(s, count2));
   };
 
-  bool operator<(const string_view v) const noexcept
-  {
-    return compare(v) < 0;
-  }
+  bool operator<(const string_view v) const noexcept { return compare(v) < 0; }
 
-  bool operator>(const string_view v) const noexcept
-  {
-    return compare(v) > 0;
-  }
+  bool operator>(const string_view v) const noexcept { return compare(v) > 0; }
 
 private:
   // Note: uses the same binary layout as libstdc++'s std::string_view
@@ -123,7 +118,12 @@ private:
 inline bool operator==(string_view lhs, string_view rhs) noexcept
 {
   return lhs.length() == rhs.length() &&
+#if _MSC_VER == 1900
+         // Avoid SCL error in Visual Studio 2015
+         (std::memcmp(lhs.data(), rhs.data(), lhs.length()) == 0);
+#else
          std::equal(lhs.data(), lhs.data() + lhs.length(), rhs.data());
+#endif
 }
 
 inline bool operator==(string_view lhs, const std::string &rhs) noexcept
@@ -177,3 +177,18 @@ inline std::ostream &operator<<(std::ostream &os, string_view s)
 }
 }  // namespace nostd
 OPENTELEMETRY_END_NAMESPACE
+
+namespace std
+{
+template <>
+struct hash<OPENTELEMETRY_NAMESPACE::nostd::string_view>
+{
+  std::size_t operator()(const OPENTELEMETRY_NAMESPACE::nostd::string_view &k) const
+  {
+    // TODO: for C++17 that has native support for std::basic_string_view it would
+    // be more performance-efficient to provide a zero-copy hash.
+    auto s = std::string(k.data(), k.size());
+    return std::hash<std::string>{}(s);
+  }
+};
+}  // namespace std

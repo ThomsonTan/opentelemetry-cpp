@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <algorithm>
+
 using opentelemetry::nostd::shared_ptr;
 
 class A
@@ -125,7 +127,7 @@ TEST(SharedPtrTest, PointerOperators)
 
   EXPECT_EQ(&*ptr1, value);
   EXPECT_EQ(
-      shared_ptr<B> {}->f(), 123);
+      shared_ptr<B> { new B }->f(), 123);
 }
 
 TEST(SharedPtrTest, Swap)

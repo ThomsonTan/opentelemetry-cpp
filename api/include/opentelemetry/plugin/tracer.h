@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "opentelemetry/common/key_value_iterable.h"
 #include "opentelemetry/plugin/detail/dynamic_library_handle.h"
 #include "opentelemetry/plugin/detail/tracer_handle.h"
 #include "opentelemetry/trace/tracer.h"
@@ -13,8 +14,8 @@ namespace plugin
 class Span final : public trace::Span
 {
 public:
-  Span(std::shared_ptr<trace::Tracer> &&tracer, std::unique_ptr<trace::Span> &&span) noexcept
-      : tracer_{std::move(tracer)}, span_{std::move(span)}
+  Span(std::shared_ptr<trace::Tracer> &&tracer, nostd::shared_ptr<trace::Span> span) noexcept
+      : tracer_{std::move(tracer)}, span_{span}
   {}
 
   // trace::Span
@@ -32,7 +33,7 @@ public:
 
   void AddEvent(nostd::string_view name,
                 core::SystemTimestamp timestamp,
-                const trace::KeyValueIterable &attributes) noexcept override
+                const common::KeyValueIterable &attributes) noexcept override
   {
     span_->AddEvent(name, timestamp, attributes);
   }
@@ -48,11 +49,11 @@ public:
 
   bool IsRecording() const noexcept override { return span_->IsRecording(); }
 
-  trace::Tracer &tracer() const noexcept override { return *tracer_; }
+  trace::SpanContext GetContext() const noexcept override { return span_->GetContext(); }
 
 private:
   std::shared_ptr<trace::Tracer> tracer_;
-  std::unique_ptr<trace::Span> span_;
+  nostd::shared_ptr<trace::Span> span_;
 };
 
 class Tracer final : public trace::Tracer, public std::enable_shared_from_this<Tracer>
@@ -64,18 +65,18 @@ public:
   {}
 
   // trace::Tracer
-  nostd::unique_ptr<trace::Span> StartSpan(
+  nostd::shared_ptr<trace::Span> StartSpan(
       nostd::string_view name,
-      const trace::KeyValueIterable &attributes,
+      const common::KeyValueIterable &attributes,
+      const trace::SpanContextKeyValueIterable &links,
       const trace::StartSpanOptions &options = {}) noexcept override
   {
-    auto span = tracer_handle_->tracer().StartSpan(name, attributes, options);
+    auto span = tracer_handle_->tracer().StartSpan(name, attributes, links, options);
     if (span == nullptr)
     {
-      return nullptr;
+      return nostd::shared_ptr<trace::Span>(nullptr);
     }
-    return nostd::unique_ptr<trace::Span>{new (std::nothrow)
-                                              Span{this->shared_from_this(), std::move(span)}};
+    return nostd::shared_ptr<trace::Span>{new (std::nothrow) Span{this->shared_from_this(), span}};
   }
 
   void ForceFlushWithMicroseconds(uint64_t timeout) noexcept override
