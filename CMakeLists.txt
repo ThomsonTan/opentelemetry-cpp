@@ -168,6 +168,7 @@ list(APPEND CMAKE_PREFIX_PATH "${CMAKE_BINARY_DIR}")
 
 if(BUILD_TESTING)
   include(CTest)
+  set_property(GLOBAL PROPERTY CTEST_TARGETS_ADDED 1)
   if(EXISTS ${CMAKE_BINARY_DIR}/lib/libgtest.a)
     # Prefer GTest from build tree. GTest is not always working with
     # CMAKE_PREFIX_PATH
