@@ -85,7 +85,7 @@ def opentelemetry_cpp_deps():
     maybe(
         http_archive,
         name = "com_github_grpc_grpc",
-        sha256 = "cdeb805385fba23242bf87073e68d590c446751e09089f26e5e0b3f655b0f089",
+        sha256 = "ae0dd23a2b7617f8e99cb434d5aabc79bd5b72e47e706f98f56c92abb63594e8",
         strip_prefix = "grpc-1.49.2",
         urls = [
             "https://github.com/grpc/grpc/archive/v1.49.2.tar.gz",
