@@ -24,7 +24,7 @@ a local file or a network location.
 
 ## Proposed Log APIs Design
 
-The logging API will reside in the `std::log` namespace and consist of the
+The logging APIs will reside in the `std::log` namespace and consist of the
 following classes and functions.
 
 ```cpp
@@ -35,9 +35,13 @@ namespace std::log
 
 enum class Severity;
 
-std::shared_ptr<std::logger> default_logger();
+std::shared_ptr<std::logger> default_logger() noexcept;
 
-void set_default_logger(std::shared_ptr<std::logger> default_logger);
+void set_default_logger(std::shared_ptr<std::logger> default_logger) noexcept;
+
+void set_severity(Severity severity) noexcept;
+
+inline bool is_enabled(Severity severity) noexcept;
 
 template <typename... ArgumentType>
 void log(Severity severity, ArgumentType &&... args) noexcept;
@@ -60,8 +64,6 @@ void error(ArgumentType &&... args) noexcept;
 template <typename... ArgumentType>
 void fatal(ArgumentType &&... args) noexcept;
 
-void set_severity(Severity severity);
-
 }
 
 ```
@@ -79,7 +81,10 @@ int main()
     // log with default_logger();
     std::log::info("Hello std::log");
 
-    std::log::warn("Hello std::log", {{"key1": 1}, {"key2": 2}});
+    if (std::log::is_enabled(std::log::kWARN))
+    {
+      std::log::warn("Hello std::log", {{"key1": 1}, {"key2": 2}});
+    }
 
     // create a new logger.
     std::shared_ptr<logger> new_logger = ...;
