@@ -28,7 +28,7 @@ namespace log_api = opentelemetry::logs;
 namespace
 {
 
-static void BM_LoggerSingleUnstructuredLogCall(benchmark::State &state)
+static void BM_LoggerSingleCall_UnstructuredLog(benchmark::State &state)
 {
     auto lp = Provider::GetLoggerProvider();
     auto logger = lp->GetLogger("UnstructuredLog");
@@ -37,9 +37,9 @@ static void BM_LoggerSingleUnstructuredLogCall(benchmark::State &state)
         logger->Trace("This is a simple unstructured log message");
     }
 }
-BENCHMARK(BM_LoggerSingleUnstructuredLogCall);
+BENCHMARK(BM_LoggerSingleCall_UnstructuredLog);
 
-static void BM_LoggerSingleStructuredLogCall(benchmark::State &state)
+static void BM_LoggerSingleCall_StructuredLog(benchmark::State &state)
 {
     auto lp = Provider::GetLoggerProvider();
     auto logger = lp->GetLogger("StructuredLog");
@@ -49,9 +49,9 @@ static void BM_LoggerSingleStructuredLogCall(benchmark::State &state)
                       opentelemetry::common::MakeAttributes({{"process_id", 12347}, {"thread_id", 12348}}));
     }
 }
-BENCHMARK(BM_LoggerSingleStructuredLogCall);
+BENCHMARK(BM_LoggerSingleCall_StructuredLog);
 
-static void BM_LoggerSingleStructuredLogCallWithEventId(benchmark::State &state)
+static void BM_LoggerSingleCall_StructuredLogWithEventId(benchmark::State &state)
 {
     auto lp = Provider::GetLoggerProvider();
     auto logger = lp->GetLogger("StructuredLogWithEventId");
@@ -61,9 +61,9 @@ static void BM_LoggerSingleStructuredLogCallWithEventId(benchmark::State &state)
                       opentelemetry::common::MakeAttributes({{"process_id", 12347}, {"thread_id", 12348}}));
     }
 }
-BENCHMARK(BM_LoggerSingleStructuredLogCallWithEventId);
+BENCHMARK(BM_LoggerSingleCall_StructuredLogWithEventId);
 
-static void BM_LoggerSingleStructuredLogCallWithEventIdStruct(benchmark::State &state)
+static void BM_LoggerSingleCall_StructuredLogWithEventIdStruct(benchmark::State &state)
 {
     auto lp = Provider::GetLoggerProvider();
     auto logger = lp->GetLogger("StructuredLogWithEventId");
@@ -75,6 +75,7 @@ static void BM_LoggerSingleStructuredLogCallWithEventIdStruct(benchmark::State &
                       opentelemetry::common::MakeAttributes({{"process_id", 12347}, {"thread_id", 12348}}));
     }
 }
+BENCHMARK(BM_LoggerSingleCall_StructuredLogWithEventIdStruct);
 
 class LoggerFixture : public benchmark::Fixture
 {
