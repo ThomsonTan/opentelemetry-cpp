@@ -191,7 +191,7 @@ public:
    *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
    */
   template <class... ArgumentType>
-  void Warn(ArgumentType &&...args) noexcept
+  void Warn(ArgumentType &&... args) noexcept
   {
     static_assert(
         !detail::LogRecordHasType<Severity, typename std::decay<ArgumentType>::type...>::value,
