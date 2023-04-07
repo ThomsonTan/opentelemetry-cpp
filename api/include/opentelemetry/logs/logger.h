@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
-#define ENABLE_LOGS_PREVIEW 1
+
 #ifdef ENABLE_LOGS_PREVIEW
 
 #  include "opentelemetry/common/key_value_iterable.h"
