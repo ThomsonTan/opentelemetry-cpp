@@ -109,6 +109,7 @@ int LoggerFixture::FunctionWithUnstructuredLog()
 {
     logger->Trace("This is a simple unstructured log message");
 
+    logger->Trace("This is another simple unstructured log message");
     return 0;
 }
 
@@ -117,6 +118,8 @@ int LoggerFixture::FunctionWithStructuredLog()
     logger->Trace("This is a simple structured log message from {process_id}:{thread_id}",
                   opentelemetry::common::MakeAttributes({{"process_id", 12347}, {"thread_id", 12348}}));
                 
+    logger->Trace("This is another simple structured log message from {process_id}:{thread_id}",
+                  opentelemetry::common::MakeAttributes({{"process_id", 12347}, {"thread_id", 12348}}));
     return 0;
 }
 
