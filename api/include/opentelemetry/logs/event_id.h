@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
+#define ENABLE_LOGS_PREVIEW 1
 #ifdef ENABLE_LOGS_PREVIEW
 
 #  include "opentelemetry/version.h"
@@ -20,13 +21,13 @@ public:
   EventId(int64_t id, nostd::string_view name) noexcept
   {
       id_ = id;
-      name_ = std::string{name};
+      name_ = nostd::unique_ptr<char []>{new char[name.length() + 1]};
+      std::copy(name.begin(), name.end(), name_.get());
   }
 
 public:
   int64_t id_;
-  // nostd::unique_ptr<const char []> name_;
-  std::string name_;
+  nostd::unique_ptr<char []> name_;
 };
 
 }  // namespace logs
