@@ -40,7 +40,8 @@ enum class Severity : uint8_t
   kFatal,
   kFatal2,
   kFatal3,
-  kFatal4
+  kFatal4,
+  kMaxSeverity,
 };
 
 /**

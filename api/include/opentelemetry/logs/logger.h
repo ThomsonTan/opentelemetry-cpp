@@ -60,7 +60,7 @@ public:
    *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
    */
   template <class... ArgumentType>
-  void EmitLogRecord(nostd::unique_ptr<LogRecord> &&log_record, ArgumentType &&... args)
+  void EmitLogRecord(nostd::unique_ptr<LogRecord> &&log_record, ArgumentType &&...args)
   {
     if (!log_record)
     {
@@ -92,7 +92,7 @@ public:
    *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
    */
   template <class... ArgumentType>
-  void EmitLogRecord(ArgumentType &&... args)
+  void EmitLogRecord(ArgumentType &&...args)
   {
     nostd::unique_ptr<LogRecord> log_record = CreateLogRecord();
     if (!log_record)
@@ -119,7 +119,7 @@ public:
    *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
    */
   template <class... ArgumentType>
-  void Trace(ArgumentType &&... args) noexcept
+  void Trace(ArgumentType &&...args) noexcept
   {
     static_assert(
         !detail::LogRecordHasType<Severity, typename std::decay<ArgumentType>::type...>::value,
@@ -143,7 +143,7 @@ public:
    *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
    */
   template <class... ArgumentType>
-  void Debug(ArgumentType &&... args) noexcept
+  void Debug(ArgumentType &&...args) noexcept
   {
     static_assert(
         !detail::LogRecordHasType<Severity, typename std::decay<ArgumentType>::type...>::value,
@@ -167,7 +167,7 @@ public:
    *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
    */
   template <class... ArgumentType>
-  void Info(ArgumentType &&... args) noexcept
+  void Info(ArgumentType &&...args) noexcept
   {
     static_assert(
         !detail::LogRecordHasType<Severity, typename std::decay<ArgumentType>::type...>::value,
@@ -191,7 +191,7 @@ public:
    *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
    */
   template <class... ArgumentType>
-  void Warn(ArgumentType &&... args) noexcept
+  void Warn(ArgumentType &&...args) noexcept
   {
     static_assert(
         !detail::LogRecordHasType<Severity, typename std::decay<ArgumentType>::type...>::value,
@@ -215,7 +215,7 @@ public:
    *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
    */
   template <class... ArgumentType>
-  void Error(ArgumentType &&... args) noexcept
+  void Error(ArgumentType &&...args) noexcept
   {
     static_assert(
         !detail::LogRecordHasType<Severity, typename std::decay<ArgumentType>::type...>::value,
@@ -239,7 +239,7 @@ public:
    *  span<pair<string_view, AttributeValue>> -> attributes(return type of MakeAttributes)
    */
   template <class... ArgumentType>
-  void Fatal(ArgumentType &&... args) noexcept
+  void Fatal(ArgumentType &&...args) noexcept
   {
     static_assert(
         !detail::LogRecordHasType<Severity, typename std::decay<ArgumentType>::type...>::value,
@@ -247,11 +247,21 @@ public:
     this->EmitLogRecord(Severity::kFatal, std::forward<ArgumentType>(args)...);
   }
 
-  virtual bool Enabled(Severity severity, const EventId &event_id) const noexcept { return false; }
+  inline bool Enabled(Severity severity, const EventId &event_id) const noexcept
+  {
+    return Enabled(severity) && Enabled(event_id.id_);
+  }
 
-  virtual bool Enabled(Severity severity, int64_t event_id) const noexcept { return false; }
+  inline bool Enabled(Severity severity, int64_t event_id) const noexcept
+  {
+    return Enabled(severity) && Enabled(event_id);
+  }
 
-  virtual bool Enabled(Severity severity) const noexcept { return false; }
+  inline bool Enabled(Severity severity) const noexcept { return severity >= minimum_severity_; }
+
+  virtual bool Enabled(const EventId &event_id) const noexcept { return false; }
+
+  virtual bool Enabled(int64_t event_id) const noexcept { return false; }
 
   /**
    * Log an event
@@ -422,6 +432,8 @@ private:
   template <class... ValueType>
   void IgnoreTraitResult(ValueType &&...)
   {}
+
+  Severity minimum_severity_ = Severity::kMaxSeverity;
 };
 }  // namespace logs
 OPENTELEMETRY_END_NAMESPACE
