@@ -203,6 +203,7 @@ set(OPENTELEMETRY_CPP_LIBRARIES)
 set(DLL_TARGET "opentelemetry-cpp::opentelemetry_cpp")
 
 foreach(_TARGET IN LISTS _OPENTELEMETRY_CPP_TARGETS)
+  message(STATUS "Listing target: ${_TARGET}")
   if(TARGET "${_TARGET}" AND NOT "${_TARGET}" STREQUAL "${DLL_TARGET}")
     list(APPEND OPENTELEMETRY_CPP_LIBRARIES "${_TARGET}")
   endif()
